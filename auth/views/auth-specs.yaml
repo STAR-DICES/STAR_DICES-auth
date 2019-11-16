@@ -1,0 +1,61 @@
+swagger: "2.0"
+info:
+  description: "This is the auth microservice specs"
+  version: "1.0.0"
+  title: "Auth Microservice"
+schemes:
+- "http"
+paths:
+  /login:
+    post:
+      operationId: login
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/Login"
+      responses:
+        '200':
+          description: "Logged in"
+          schema:
+            $ref: '#/definitions/Id'
+        '400':
+          description: "Wrong username or password"
+
+definitions:
+  Login:
+    type: "object"
+    properties:
+      email:
+        type: "string"
+      password:
+        type: "string"
+    xml:
+      name: "Login"
+  Id:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+    xml:
+      name: "Id"
+  Signup:
+    type: "object"
+    properties:
+      firstname:
+        type: "string"
+      lastname:
+        type: "string"
+      dateofbirth:
+        type: "string"
+      email:
+        type: "string"
+      password:
+        type: "string"
+    xml:
+      name: "Signup"
