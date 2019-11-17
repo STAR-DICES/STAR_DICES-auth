@@ -56,6 +56,9 @@ definitions:
         type: "string"
       password:
         type: "string"
+    required:
+    - "email"
+    - "password"
     additionalProperties: false
     xml:
       name: "Login"
@@ -75,10 +78,17 @@ definitions:
         type: "string"
       dateofbirth:
         type: "string"
+        format: "date"
       email:
         type: "string"
       password:
         type: "string"
+    required:
+    - "firstname"
+    - "lastname"
+    - "dateofbirth"
+    - "email"
+    - "password"
     additionalProperties: false
     xml:
       name: "Signup"

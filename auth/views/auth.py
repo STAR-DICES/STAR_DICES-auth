@@ -4,6 +4,7 @@ from sqlalchemy.exc import IntegrityError
 from auth.database import db, User
 from werkzeug.security import generate_password_hash, check_password_hash
 from jsonschema import validate, ValidationError
+from datetime import datetime
 
 auth = SwaggerBlueprint('auth', 'auth', swagger_spec='./auth/views/auth-specs.yaml')
 schema= auth.spec['definitions']
@@ -62,15 +63,19 @@ def create_user():
     dateofbirth = json_data['dateofbirth']
     email = json_data['email']
     password = json_data['password']
-    new_user = User(firstname, lastname, dateofbirth, email)
+    new_user = User()
+    new_user.firstname = firstname
+    new_user.lastname = lastname
+    new_user.email = email
+    new_user.dateofbirth = datetime.strptime(dateofbirth, '%m/%d/%Y').date()
     new_user.set_password(password)
     db.session.add(new_user)
     try:
         db.session.commit()
-        return login()
+        return jsonify({'id': new_user.id})
     except IntegrityError:
         db.session.rollback()
-        form.message="Seems like this email is already used"
+        return abort(409)
 
 def authenticate(self, password):
         checked = check_password_hash(self.password, password)
