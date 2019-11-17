@@ -24,8 +24,29 @@ paths:
           description: "Logged in"
           schema:
             $ref: '#/definitions/Id'
-        '400':
+        '401':
           description: "Wrong username or password"
+  /signup:
+    post:
+      summary: "Signup operation"
+      operationId: "signup"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/Signup"
+      responses:
+        '200':
+          description: "Signed up"
+          schema:
+            $ref: '#/definitions/Signup'
+        '409':
+          description: "Email already used"
 
 definitions:
   Login:
@@ -35,6 +56,7 @@ definitions:
         type: "string"
       password:
         type: "string"
+    additionalProperties: false
     xml:
       name: "Login"
   Id:
@@ -57,5 +79,6 @@ definitions:
         type: "string"
       password:
         type: "string"
+    additionalProperties: false
     xml:
       name: "Signup"
