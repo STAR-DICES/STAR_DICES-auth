@@ -6,10 +6,12 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from jsonschema import validate, ValidationError
 from datetime import datetime
 
-auth = SwaggerBlueprint('auth', 'auth', swagger_spec='./auth/views/auth-specs.yaml')
+auth = SwaggerBlueprint('auth', 'auth', swagger_spec='./auth/static/auth-specs.yaml')
 schema= auth.spec['definitions']
 login_schema=schema['Login']
 signup_schema=schema['Signup']
+id_schema=schema['Id']
+
 """
 This route is used to display the form to let the user login.
 """
@@ -18,20 +20,18 @@ def login():
     #To be redirect directly from API Gateway
     #if not current_user.is_anonymous:
     #    return redirect("/", code=302)
-    json_data = request.get_json()
-    try:
-        validate(json_data, schema=login_schema)
-    except ValidationError as error:
-        return abort(400)
-    
-    email = json_data['email']
-    password = json_data['password']
-    q = db.session.query(User).filter(User.email == email)
-    user = q.first()
-    if user is not None and user.authenticate(password):
-        return jsonify({'id': user.id})
+    if general_validator('login', request):
+        json_data= request.get_json()
+        email = json_data['email']
+        password = json_data['password']
+        q = db.session.query(User).filter(User.email == email)
+        user = q.first()
+        if user is not None and user.authenticate(password):
+            return jsonify({'id': user.id})
+        else:
+            return abort(401, description= "Wrong username or password")
     else:
-        return abort(401, description= "Wrong username or password")
+         return abort(400)
 
 """
 This route is used to let the user logout.
@@ -51,31 +51,28 @@ def create_user():
     #To be redirect directly from API Gateway
     #if not current_user.is_anonymous:
     #    return redirect("/", code=302)
-    
-    json_data = request.get_json()
-    try:
-        validate(json_data, schema=signup_schema)
-    except ValidationError as error:
-        return abort(400)
-    
-    firstname = json_data['firstname']
-    lastname = json_data['lastname']
-    dateofbirth = json_data['dateofbirth']
-    email = json_data['email']
-    password = json_data['password']
-    new_user = User()
-    new_user.firstname = firstname
-    new_user.lastname = lastname
-    new_user.email = email
-    new_user.dateofbirth = datetime.strptime(dateofbirth, '%m/%d/%Y').date()
-    new_user.set_password(password)
-    db.session.add(new_user)
-    try:
-        db.session.commit()
-        return jsonify({'id': new_user.id})
-    except IntegrityError:
-        db.session.rollback()
-        return abort(409)
+    if general_validator('signup', request):
+        json_data= request.get_json()
+        firstname = json_data['firstname']
+        lastname = json_data['lastname']
+        dateofbirth = json_data['dateofbirth']
+        email = json_data['email']
+        password = json_data['password']
+        new_user = User()
+        new_user.firstname = firstname
+        new_user.lastname = lastname
+        new_user.email = email
+        new_user.dateofbirth = datetime.strptime(dateofbirth, '%m/%d/%Y')
+        new_user.set_password(password)
+        db.session.add(new_user)
+        try:
+            db.session.commit()
+            return jsonify({'id': new_user.id})
+        except IntegrityError:
+            db.session.rollback()
+            return abort(409)
+    else:
+         return abort(400)
 
 def authenticate(self, password):
         checked = check_password_hash(self.password, password)
@@ -84,3 +81,20 @@ def authenticate(self, password):
 
 def set_password(self, password):
         self.password = generate_password_hash(password, method='sha256')
+
+def general_validator(op_id, request):
+    schema= auth.spec['paths']
+    for endpoint in schema.keys():
+        for method in schema[endpoint].keys():
+            if schema[endpoint][method]['operationId']==op_id:
+                if 'parameters' in schema[endpoint][method]:
+                    op_schema= schema[endpoint][method]['parameters'][0]
+                    definition= op_schema['schema']['$ref'].split("/")[2]
+                    schema= auth.spec['definitions'][definition]
+                    try:
+                        validate(request.get_json(), schema=schema)
+                        return True
+                    except ValidationError as error:
+                        return False
+                else:
+                     return True

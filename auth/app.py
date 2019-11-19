@@ -3,8 +3,10 @@ import json
 import os
 from auth.views import blueprints
 from auth.database import db, User
-
 from flakon import create_app
+
+from swagger_ui import api_doc
+
 
 def start(test = False):
     app=create_app(blueprints=blueprints)
@@ -17,6 +19,8 @@ def start(test = False):
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
         app.config['WTF_CSRF_ENABLED'] = False
         app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+    api_doc(app, config_path='./auth/static/auth-specs.yaml', url_prefix='/api', title='API doc')
     db.init_app(app)
     db.create_all(app=app)
 

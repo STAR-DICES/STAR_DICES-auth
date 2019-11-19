@@ -8,6 +8,7 @@ schemes:
 paths:
   /login:
     post:
+      summary: "Login operation"
       operationId: login
       consumes:
       - "application/json"
@@ -41,10 +42,10 @@ paths:
         schema:
           $ref: "#/definitions/Signup"
       responses:
-        '200':
+        '201':
           description: "Signed up"
           schema:
-            $ref: '#/definitions/Signup'
+            $ref: '#/definitions/Id'
         '409':
           description: "Email already used"
 
@@ -67,6 +68,9 @@ definitions:
     properties:
       id:
         type: "integer"
+    required:
+    - "id"
+    additionalProperties: false
     xml:
       name: "Id"
   Signup:
