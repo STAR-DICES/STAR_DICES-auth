@@ -1,6 +1,6 @@
 swagger: "2.0"
 info:
-  description: "This is the auth microservice specs"
+  description: "This microservice handles requests to login and signup the users"
   version: "1.0.0"
   title: "Auth Microservice"
 schemes:
