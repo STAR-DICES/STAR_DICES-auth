@@ -87,8 +87,8 @@ def general_validator(op_id, request):
     for endpoint in schema.keys():
         for method in schema[endpoint].keys():
             if schema[endpoint][method]['operationId']==op_id:
-                if 'parameters' in schema[endpoint][method]:
-                    op_schema= schema[endpoint][method]['parameters'][0]
+                op_schema= schema[endpoint][method]['parameters'][0]
+                if 'schema' in op_schema:
                     definition= op_schema['schema']['$ref'].split("/")[2]
                     schema= auth.spec['definitions'][definition]
                     try:
@@ -98,3 +98,4 @@ def general_validator(op_id, request):
                         return False
                 else:
                      return True
+                     
