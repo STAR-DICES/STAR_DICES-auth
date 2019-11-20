@@ -27,7 +27,7 @@ def login():
         q = db.session.query(User).filter(User.email == email)
         user = q.first()
         if user is not None and user.authenticate(password):
-            return jsonify({'id': user.id})
+            return jsonify({'user_id': user.id, 'firstname': user.firstname})
         else:
             return abort(401, description= "Wrong username or password")
     else:
@@ -67,7 +67,7 @@ def create_user():
         db.session.add(new_user)
         try:
             db.session.commit()
-            return jsonify({'id': new_user.id})
+            return jsonify({'user_id': new_user.id, 'firstname': new_user.firstname})
         except IntegrityError:
             db.session.rollback()
             return abort(409)

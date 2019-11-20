@@ -66,10 +66,13 @@ definitions:
   Id:
     type: "object"
     properties:
-      id:
+      user_id:
         type: "integer"
+      firstname:
+        type: "string"
     required:
-    - "id"
+    - "user_id"
+    - "firstname"
     additionalProperties: false
     xml:
       name: "Id"
