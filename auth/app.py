@@ -20,7 +20,7 @@ def start(test = False):
         app.config['WTF_CSRF_ENABLED'] = False
         app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-    api_doc(app, config_path='auth-specs.yaml', url_prefix='/api', title='API doc')
+    api_doc(app, config_path='./auth/views/auth-specs.yaml', url_prefix='/api', title='API doc')
     db.init_app(app)
     db.create_all(app=app)
 
