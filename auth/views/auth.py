@@ -6,7 +6,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from jsonschema import validate, ValidationError
 from datetime import datetime
 
-auth = SwaggerBlueprint('auth', 'auth', swagger_spec='./auth/views/auth-specs.yaml')
+auth = SwaggerBlueprint('auth', 'auth', swagger_spec='./auth/auth-specs.yaml')
 schema= auth.spec['definitions']
 login_schema=schema['Login']
 signup_schema=schema['Signup']
