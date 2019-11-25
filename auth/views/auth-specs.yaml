@@ -1,0 +1,101 @@
+swagger: "2.0"
+info:
+  description: "This microservice handles requests to login and signup the users"
+  version: "1.0.0"
+  title: "Auth Microservice"
+schemes:
+- "http"
+paths:
+  /login:
+    post:
+      summary: "Login operation"
+      operationId: login
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/Login"
+      responses:
+        '200':
+          description: "Logged in"
+          schema:
+            $ref: '#/definitions/Id'
+        '401':
+          description: "Wrong username or password"
+  /signup:
+    post:
+      summary: "Signup operation"
+      operationId: "signup"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/Signup"
+      responses:
+        '201':
+          description: "Signed up"
+          schema:
+            $ref: '#/definitions/Id'
+        '409':
+          description: "Email already used"
+
+definitions:
+  Login:
+    type: "object"
+    properties:
+      email:
+        type: "string"
+      password:
+        type: "string"
+    required:
+    - "email"
+    - "password"
+    additionalProperties: false
+    xml:
+      name: "Login"
+  Id:
+    type: "object"
+    properties:
+      user_id:
+        type: "integer"
+      firstname:
+        type: "string"
+    required:
+    - "user_id"
+    - "firstname"
+    additionalProperties: false
+    xml:
+      name: "Id"
+  Signup:
+    type: "object"
+    properties:
+      firstname:
+        type: "string"
+      lastname:
+        type: "string"
+      dateofbirth:
+        type: "string"
+        format: "date"
+      email:
+        type: "string"
+      password:
+        type: "string"
+    required:
+    - "firstname"
+    - "lastname"
+    - "dateofbirth"
+    - "email"
+    - "password"
+    additionalProperties: false
+    xml:
+      name: "Signup"
