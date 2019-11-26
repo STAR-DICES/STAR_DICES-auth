@@ -48,7 +48,7 @@ paths:
             $ref: '#/definitions/Id'
         '409':
           description: "Email already used"
-  /user-exists:
+  /user-exists/{user_id}:
     get:
       summary: "Check if a user exists (200) or not (404)"
       operationId: "user-exists"

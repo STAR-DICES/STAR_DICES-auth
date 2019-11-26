@@ -80,12 +80,12 @@ def int_validator(string):
 def user_exists(user_id):
     if int_validator(user_id) == None:
         return "Not Found!", 404 
-    q = db.session.query(User).filter(User.user_id == user_id)
+    q = db.session.query(User).filter(User.id == user_id)
     user = q.first()
     if user is None:
         abort(404)
     else:
-        return "", 200
+        return jsonify({'author_name': user.firstname})
 
 def set_password(self, password):
         self.password = generate_password_hash(password, method='sha256')
