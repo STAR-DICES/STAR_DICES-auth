@@ -1,9 +1,41 @@
-from auth.views.test.TestHelper import TestHelper
+import unittest
+import json
+
+from auth.app import start
+from flask_testing import TestCase
 from sqlalchemy.exc import IntegrityError
 from auth.database import db, User
 from flask_login import current_user
 
-class TestAuth(TestHelper):
+
+class TestHelper(TestCase): # pragma: no cover
+    def create_app(self):
+        self.app = start(test=True)
+        self.context = self.app.app_context()
+        self.client = self.app.test_client()
+        return self.app
+
+    def tearDown(self):
+        with self.context:
+            db.drop_all()
+
+    def _login(self, email, password, follow_redirects=False):
+        return self.client.post('/login', follow_redirects=follow_redirects, data={
+            'email': email,
+            'password': password
+        })
+
+    def _signup(self, email, password, first_name, last_name, birthday, follow_redirects=False):
+        return self.client.post('/signup', follow_redirects=follow_redirects, data={
+            'email': email,
+            'firstname': first_name,
+            'lastname': last_name,
+            'password': password,
+            'dateofbirth': birthday
+        })
+
+    def _logout(self, follow_redirects=False):
+        return self.client.get('/logout', follow_redirects=follow_redirects)
 
 
     def test_login(self):
