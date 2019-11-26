@@ -48,10 +48,10 @@ paths:
             $ref: '#/definitions/Id'
         '409':
           description: "Email already used"
-  /user_exist:
+  /user-exists:
     get:
       summary: "Check if a user exists (200) or not (404)"
-      operationId: "user_exists"
+      operationId: "user-exists"
       parameters:
       - in: "path"
         name: "user_id"
@@ -62,7 +62,7 @@ paths:
           description: "User exists"
         '404':
           description: "User doesn't exists"
-          
+
 
 definitions:
   Login:

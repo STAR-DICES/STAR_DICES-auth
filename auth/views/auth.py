@@ -76,7 +76,7 @@ def int_validator(string):
         return None
     return value
 
-@auth.operation('user_exists')
+@auth.operation('user-exists')
 def user_exists(user_id):
     if int_validator(user_id) == None:
         return "Not Found!", 404 
