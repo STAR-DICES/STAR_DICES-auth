@@ -7,6 +7,5 @@ WORKDIR /STAR_DICES-auth
 RUN pip3 install -r requirements.txt
 RUN python3 setup.py develop
 ENV LANG C.UTF-8
-WORKDIR /STAR_DICES-auth/auth
 EXPOSE 5000
-CMD ["python3", "app.py"]
+CMD ["python3", "auth/app.py"]
