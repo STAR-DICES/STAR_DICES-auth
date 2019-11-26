@@ -34,16 +34,6 @@ def login():
          return abort(400)
 
 """
-This route is used to let the user logout.
-#This route should be directly handled from API gateway#
-"""
-#@auth.route("/logout")
-#@login_required
-#def logout():
-#    logout_user()
-#    return redirect('/')
-
-"""
 This route is used to let a new user signup.
 """
 @auth.operation('signup')
@@ -78,6 +68,24 @@ def authenticate(self, password):
         checked = check_password_hash(self.password, password)
         self._authenticated = checked
         return self._authenticated
+
+def int_validator(string):
+    try:
+        value= int(string)
+    except (ValueError, TypeError):
+        return None
+    return value
+
+@auth.operation('user_exists')
+def user_exists(user_id):
+    if int_validator(user_id) == None:
+        return "Not Found!", 404 
+    q = db.session.query(User).filter(User.user_id == user_id)
+    user = q.first()
+    if user is None:
+        abort(404)
+    else:
+        return "", 200
 
 def set_password(self, password):
         self.password = generate_password_hash(password, method='sha256')
