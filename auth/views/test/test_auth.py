@@ -86,32 +86,6 @@ class TestAuth(TestCase): # pragma: no cover
                                         'firstname': "holy10characterspls"
                                         })
 
-        
-        # # error:signup while logged in
-        # reply = self._login('example@example.com', 'admin')
-        # self.assertEqual(reply.status_code, 302)
-        # reply = self._signup('example2@example.com', 'not10char', 'admin', 'giacobbe', '01/04/1006')
-        # self.assertEqual(reply.status_code, 302)
-        # with self.context:
-        #     q = User.query.filter_by(email='example3@example.com').first()
-        #     self.assertIsNone(q)
-        
-        # # error:not enough char in password
-        # # self._logout()
-        # reply = self._signup('example2@example.com', 'not10char', 'admin', 'giacobbe', '01/04/1006')
-        # self.assertEqual(reply.status_code, 200)
-        # with self.context:
-        #     q = User.query.filter_by(email='example3@example.com').first()
-        #     self.assertIsNone(q)
-        
-        # # success:register user
-        # self._signup('example3@example.com', 'holy10characterspls', 'admin', 'giacobbe', '01/04/2006', True)
-        # self._login('example3@example.com', 'admin')
-        # with self.context:
-        #     q = User.query.filter_by(email='example3@example.com').first()
-        #     self.assertIsNotNone(q)
-            
-
     def test_user_exists(self):
 
         # user present in db
