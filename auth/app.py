@@ -37,6 +37,14 @@ def start(test = False):
             example.is_admin = True
             example.set_password('admin')
             db.session.add(example)
+            example = User()
+            example.firstname = 'Pluto'
+            example.lastname = 'Pluto'
+            example.email = 'example2@example.com'
+            example.dateofbirth = datetime.datetime(2020, 10, 5)
+            example.is_admin = True
+            example.set_password('admin')
+            db.session.add(example)
             db.session.commit()
 
     return app
