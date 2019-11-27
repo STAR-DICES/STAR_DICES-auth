@@ -4,6 +4,7 @@ import json
 from auth.app import start
 from flask_testing import TestCase
 from sqlalchemy.exc import IntegrityError
+from werkzeug.security import generate_password_hash
 from auth.database import db, User
 from flask_login import current_user
 
@@ -33,58 +34,125 @@ class TestHelper(TestCase): # pragma: no cover
             'password': password,
             'dateofbirth': birthday
         })
-
-    def _logout(self, follow_redirects=False):
-        return self.client.get('/logout', follow_redirects=follow_redirects)
-
-
-    def test_login(self):
-        
-        # error:wrong pass
-        reply = self._login("example@example.com", "42")
-        # self.assert_context("notlogged", True)
-        with self.context:
-            q = User.query.filter_by(email="example@example.com")
-            self.assertNotEqual(q.first(), current_user)
-
-        # success: logged in
-        reply = self._login("example@example.com", "admin")
-        self.assertEqual(reply.status_code, 302)
-        with self.context:
-            q = User.query.filter_by(email="example@example.com").first()
-            #self.assertEqual(current_user.id, q.id) # current_user anonymous?
-
-        
-    def test_signup(self):
     
-        # error:same email
-        self._signup('example@example.com', 'adminadmin', 'admin', 'giacobbe', '01/04/1006')
-        
-        # error:signup while logged in
-        reply = self._login('example@example.com', 'admin')
-        self.assertEqual(reply.status_code, 302)
-        reply = self._signup('example2@example.com', 'not10char', 'admin', 'giacobbe', '01/04/1006')
-        self.assertEqual(reply.status_code, 302)
-        with self.context:
-            q = User.query.filter_by(email='example3@example.com').first()
-            self.assertIsNone(q)
-        
-        # error:not enough char in password
-        self._logout()
-        reply = self._signup('example2@example.com', 'not10char', 'admin', 'giacobbe', '01/04/1006')
+
+
+    def test_login_invalid(self):
+
+        # error: invalid request
+        # 
+        data = { 'email': "example@example.com" }
+        headers = {'Content-type': 'application/json'}
+        reply = self.client.post('/login', json=data, headers=headers)
+        self.assertEqual(reply.status_code, 400)
+
+    def test_login_wrong(self):
+        # error: wrong pass
+        # 
+        data = { 'email': "example@example.com", 'password': "42" }
+        headers = {'Content-type': 'application/json'}
+        reply = self.client.post('/login', json=data, headers=headers)
+        self.assertEqual(reply.status_code, 401)
+
+    def test_login_correct(self):
+        # sussess: user and pwd correct
+        # 
+        data = { 
+                'email': "example@example.com",
+                'password': "admin"
+                }
+        headers = {'Content-type': 'application/json'}
+        reply = self.client.post('/login', json=data, headers=headers)
         self.assertEqual(reply.status_code, 200)
-        with self.context:
-            q = User.query.filter_by(email='example3@example.com').first()
-            self.assertIsNone(q)
-        
-        # success:register user
-        self._signup('example3@example.com', 'holy10characterspls', 'admin', 'giacobbe', '01/04/2006', True)
-        self._login('example3@example.com', 'admin')
-        with self.context:
-            q = User.query.filter_by(email='example3@example.com').first()
-            self.assertIsNotNone(q)
-            
-                
+        self.assertEqual(reply.data, { "firstname": "Admin", "user_id": 1 } )
 
         
+
+    def test_signup_invalid(self):
+
+        # error: invalid request
+        # 
+        data = { 
+                'firstname': "adminadmin",
+                'lastname': "admin",
+                'password': "giacobbe",
+                'dateofbirth': "10/05/2020"
+                }
+        headers = {'Content-type': 'application/json'}
+        reply = self.client.post('/signup', json=data, headers=headers)
+        self.assertEqual(reply.status_code, 400)
+
+    def test_signup_error(self):
+        # error: same email
+        # 
+        data = { 
+                'email': "example@example.com",
+                'firstname': "adminadmin",
+                'lastname': "admin",
+                'password': "giacobbe",
+                'dateofbirth': "10/05/2020"
+                }
+        headers = {'Content-type': 'application/json'}
+        reply = self.client.post('/signup', json=data, headers=headers)
+        self.assertEqual(reply.status_code, 409)
+
+    def test_signup_success(self):
+        # success: user and pwd correct
+        # 
+        data = { 
+                'email': "example3@example.com",
+                'firstname': "holy10characterspls",
+                'lastname': "admin",
+                'password': "giacobbe",
+                'dateofbirth': "01/04/2006"
+                }
+        headers = {'Content-type': 'application/json'}
+        reply = self.client.post('/signup', json=data, headers=headers)
+        self.assertEqual(reply.status_code, 200)
+        self.assertEqual(reply.data, {
+                                        'user_id': 2,
+                                        'firstname': "holy10characterspls"
+                                        })
+
         
+        # # error:signup while logged in
+        # reply = self._login('example@example.com', 'admin')
+        # self.assertEqual(reply.status_code, 302)
+        # reply = self._signup('example2@example.com', 'not10char', 'admin', 'giacobbe', '01/04/1006')
+        # self.assertEqual(reply.status_code, 302)
+        # with self.context:
+        #     q = User.query.filter_by(email='example3@example.com').first()
+        #     self.assertIsNone(q)
+        
+        # # error:not enough char in password
+        # # self._logout()
+        # reply = self._signup('example2@example.com', 'not10char', 'admin', 'giacobbe', '01/04/1006')
+        # self.assertEqual(reply.status_code, 200)
+        # with self.context:
+        #     q = User.query.filter_by(email='example3@example.com').first()
+        #     self.assertIsNone(q)
+        
+        # # success:register user
+        # self._signup('example3@example.com', 'holy10characterspls', 'admin', 'giacobbe', '01/04/2006', True)
+        # self._login('example3@example.com', 'admin')
+        # with self.context:
+        #     q = User.query.filter_by(email='example3@example.com').first()
+        #     self.assertIsNotNone(q)
+            
+
+    def test_user_exists(self):
+
+        # user present in db
+        # 
+        reply = self.client.get('user-exists/1')
+        self.assertEqual(reply.status_code, 200)
+
+        # user non present in db
+        # 
+        reply = self.client.get('user-exists/999')
+        self.assertEqual(reply.status_code, 404)
+
+        # error: user_id not a number
+        # 
+        reply = self.client.get('user-exists/user')
+        self.assertEqual(reply.status_code, 404)

@@ -64,6 +64,9 @@ def create_user():
     else:
          return abort(400)
 
+def set_password(self, password):
+        self.password = generate_password_hash(password, method='sha256')
+
 def authenticate(self, password):
         checked = check_password_hash(self.password, password)
         self._authenticated = checked
@@ -86,9 +89,6 @@ def user_exists(user_id):
         abort(404)
     else:
         return jsonify({'author_name': user.firstname})
-
-def set_password(self, password):
-        self.password = generate_password_hash(password, method='sha256')
 
 def general_validator(op_id, request):
     schema= auth.spec['paths']
